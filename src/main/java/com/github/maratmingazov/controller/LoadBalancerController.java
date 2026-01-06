@@ -19,12 +19,8 @@ public class LoadBalancerController {
 
     @RequestMapping("/**")
     public ResponseEntity<String> proxy(HttpServletRequest request) throws IOException {
-        String backend = strategy.chooseBackend(request);
-
-        byte[] body = null;
-        if (request.getContentLength() > 0) {body = request.getInputStream().readAllBytes();}
-
-        var response = proxyClient.forward(backend, request, body);
+        var backend = strategy.chooseBackend(request);
+        var response = proxyClient.forward(backend, request);
         return ResponseEntity
                 .status(response.getStatusCode())
                 .body(response.getBody());
