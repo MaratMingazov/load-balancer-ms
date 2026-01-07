@@ -9,6 +9,9 @@ public class AppConfiguration {
 
     @Bean
     public RestClient restClient() {
-        return RestClient.builder().build();
+        return RestClient.builder()
+                .defaultHeader("Accept", "application/json")
+                .defaultHeader("Content-Type", "application/json")
+                .build();
     }
 }
