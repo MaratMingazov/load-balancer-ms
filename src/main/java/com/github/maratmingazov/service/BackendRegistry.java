@@ -11,9 +11,13 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class BackendRegistry {
 
+//    private final List<String> backends = List.of(
+//            "http://localhost:8090",
+//            "http://localhost:8095"
+//    );
     private final List<String> backends = List.of(
-            "http://localhost:8090",
-            "http://localhost:8095"
+            "http://widgets-ms-red:8090",
+            "http://widgets-ms-blue:8095"
     );
 
     private final Set<String> unhealthy = ConcurrentHashMap.newKeySet();
