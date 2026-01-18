@@ -158,6 +158,9 @@ curl -X DELETE "http://localhost:8080/stickyNote?boardKey=your_board_key&widgetI
 
 ---
 
+##  Kafka-UI
+http://localhost:8088
+
 ## 🧪 Suggested Student Exercises
 
 - Implement sticky sessions (IP Hash)
