@@ -10,6 +10,7 @@ services:
       MIRO_TOKEN: xxx
       DEFAULT_COLOR: RED
       SERVER_PORT: 8090
+      KAFKA_SERVER: kafka-ms:9092
 
   widgets-ms-blue:
     image: maratmingazovr/widgets-ms:1.0
@@ -20,6 +21,7 @@ services:
       MIRO_TOKEN: xxx
       DEFAULT_COLOR: BLUE
       SERVER_PORT: 8095
+      KAFKA_SERVER: kafka-ms:9092
 
   load-balancer:
     image: maratmingazovr/load-balancer-ms:1.0
@@ -35,19 +37,21 @@ services:
     container_name: kafka-ms
     ports:
       - "9092:9092"
+      - "9094:9094"  # for localhost
 
     environment:
       KAFKA_PROCESS_ROLES: "broker,controller"
       KAFKA_NODE_ID: 1
       KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka:9093"
 
-      KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093"
-      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092"
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT"
+      KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:9092,EXTERNAL://0.0.0.0:9094,CONTROLLER://0.0.0.0:9093"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka-ms:9092,EXTERNAL://localhost:9094"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT"
       KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
       CLUSTER_ID: "kraft-cluster-1"
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
       KAFKA_CREATE_TOPICS: "widget-events:2:1"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
@@ -58,3 +62,26 @@ services:
     environment:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+
+  audit-logs:
+    image: maratmingazovr/audit-logs-ms:1.0
+    container_name: audit-logs-ms
+    ports:
+      - "8050:8050"
+    depends_on:
+      - audit-logs-db
+    environment:
+      - DB_URL=jdbc:postgresql://audit-logs-db:5432/auditlogsdb
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=password
+      - KAFKA_SERVER=kafka-ms:9092
+
+  audit-logs-db:
+    image: 'postgres:16.11-alpine'
+    container_name: AuditLogsDB
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=auditlogsdb
