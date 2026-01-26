@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 import java.io.IOException;
+import java.net.URI;
 
 
 @Log4j2
@@ -20,13 +21,15 @@ public class ProxyClient {
 
     public ResponseEntity<String> forward(String backend, HttpServletRequest request) throws IOException {
 
-        String targetUrl = backend + request.getRequestURI();
+        StringBuilder targetUrl = new StringBuilder(backend + request.getRequestURI());
         if (request.getQueryString() != null) {
-            targetUrl += "?" + request.getQueryString();
+            targetUrl.append("?").append(request.getQueryString());
         }
         log.info("Request forwarding to backend {} ", targetUrl);
 
-        var requestSpec = restClient.method(HttpMethod.valueOf(request.getMethod())).uri(targetUrl);
+        // Create URI from already-encoded string to prevent double encoding
+        URI uri = URI.create(targetUrl.toString());
+        var requestSpec = restClient.method(HttpMethod.valueOf(request.getMethod())).uri(uri);
 
         // Read body for methods that can have request body
         // getContentLength() returns -1 when Content-Length header is not set (e.g., chunked encoding)
