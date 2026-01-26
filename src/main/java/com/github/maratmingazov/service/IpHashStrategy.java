@@ -14,6 +14,7 @@ public class IpHashStrategy implements LoadBalancingStrategy{
     public String chooseBackend(HttpServletRequest request) {
         String ip = request.getRemoteAddr();
         var backends = registry.getBackends();
+        if (backends.isEmpty()) {throw new RuntimeException("No available backends");}
         int index = Math.abs(ip.hashCode() % backends.size());
         return backends.get(index);
     }

@@ -18,6 +18,7 @@ public class RoundRobinStrategy implements LoadBalancingStrategy {
     @Override
     public String chooseBackend(HttpServletRequest request) {
         var backends = registry.getHealthyBackends();
+        if (backends.isEmpty()) {throw new RuntimeException("No available backends");}
         int index = Math.abs(counter.getAndIncrement() % backends.size());
         return backends.get(index);
     }
