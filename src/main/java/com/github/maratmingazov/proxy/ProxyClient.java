@@ -28,13 +28,17 @@ public class ProxyClient {
 
         var requestSpec = restClient.method(HttpMethod.valueOf(request.getMethod())).uri(targetUrl);
 
-        if (request.getContentLength() > 0) {
+        // Read body for methods that can have request body
+        // getContentLength() returns -1 when Content-Length header is not set (e.g., chunked encoding)
+        HttpMethod method = HttpMethod.valueOf(request.getMethod());
+        if (method == HttpMethod.POST || method == HttpMethod.PUT || method == HttpMethod.PATCH) {
             var body = request.getInputStream().readAllBytes();
-            requestSpec.body(body);
+            if (body.length > 0) {
+                requestSpec.body(body);
+            }
         }
 
-        var response = requestSpec.retrieve().toEntity(String.class);
-        return response;
+        return requestSpec.retrieve().toEntity(String.class);
     }
 
 }
