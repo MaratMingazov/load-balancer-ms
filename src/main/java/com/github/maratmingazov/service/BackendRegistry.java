@@ -1,5 +1,6 @@
 package com.github.maratmingazov.service;
 
+import com.github.maratmingazov.config.LoadBalancerProperties;
 import lombok.Getter;
 import org.springframework.stereotype.Service;
 
@@ -11,16 +12,12 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class BackendRegistry {
 
-//    private final List<String> backends = List.of(
-//            "http://localhost:8090",
-//            "http://localhost:8095"
-//    );
-    private final List<String> backends = List.of(
-            "http://widgets-ms-red:8090",
-            "http://widgets-ms-blue:8095"
-    );
-
+    private final List<String> backends;
     private final Set<String> unhealthy = ConcurrentHashMap.newKeySet();
+
+    public BackendRegistry(LoadBalancerProperties properties) {
+        this.backends = properties.getBackends();
+    }
 
     public List<String> getHealthyBackends() {
         return backends.stream()

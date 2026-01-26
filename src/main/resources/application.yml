@@ -1,0 +1,10 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: @app.name@
+  profiles:
+    active: @spring.profiles.active@
+  main:
+    allow-bean-definition-overriding: true

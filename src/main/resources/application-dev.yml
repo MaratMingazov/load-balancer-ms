@@ -1,0 +1,4 @@
+load-balancer:
+  backends:
+    - http://localhost:8090
+    - http://localhost:8095

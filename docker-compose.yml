@@ -31,6 +31,9 @@ services:
     depends_on:
       - widgets-ms-red
       - widgets-ms-blue
+    environment:
+      BACKEND_SERVER_RED: http://widgets-ms-red:8090
+      BACKEND_SERVER_BLUE: http://widgets-ms-blue:8095
 
   kafka:
     image: confluentinc/cp-kafka:7.7.7

@@ -1,0 +1,4 @@
+load-balancer:
+  backends:
+    - ${BACKEND_SERVER_RED}
+    - ${BACKEND_SERVER_BLUE}
