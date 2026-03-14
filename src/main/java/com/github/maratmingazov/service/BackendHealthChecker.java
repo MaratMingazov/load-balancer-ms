@@ -26,7 +26,7 @@ public class BackendHealthChecker {
         }
     }
 
-    @Scheduled(fixedDelay = 5000)
+    @Scheduled(fixedDelay = 10000)
     public void checkHealth() {
         registry.getBackends().forEach(backend -> {
             if (isHealthy(backend)) {
