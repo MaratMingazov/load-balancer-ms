@@ -43,17 +43,33 @@ services:
       - "9094:9094"  # for localhost
 
     environment:
+      # KRaft режим (без Zookeeper): этот узел одновременно broker (хранит данные) и controller (управляет кластером)
       KAFKA_PROCESS_ROLES: "broker,controller"
+      # Уникальный ID узла в кластере
       KAFKA_NODE_ID: 1
+      # Список controller-узлов для выбора лидера: формат id@host:port
       KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka:9093"
 
+      # Адреса, на которых Kafka слушает входящие соединения:
+      # PLAINTEXT  — для других контейнеров (внутри Docker сети)
+      # EXTERNAL   — для подключения с хост-машины (localhost)
+      # CONTROLLER — служебный, для внутренней координации между брокерами
       KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:9092,EXTERNAL://0.0.0.0:9094,CONTROLLER://0.0.0.0:9093"
+      # Адреса, которые Kafka анонсирует клиентам для подключения (должны быть достижимы клиентом):
+      # PLAINTEXT — через Docker DNS (kafka-ms) для других контейнеров
+      # EXTERNAL  — через localhost для подключения снаружи Docker (например, из IDE)
       KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka-ms:9092,EXTERNAL://localhost:9094"
+      # Маппинг: какой протокол безопасности использовать для каждого listener-а
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT"
+      # Указывает, какой listener используется для внутренней координации контроллеров
       KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+      # Уникальный ID кластера (обязателен в KRaft режиме)
       CLUSTER_ID: "kraft-cluster-1"
+      # Разрешить Kafka автоматически создавать топики при первом обращении к ним
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      # Создать топик при старте: widget-events с 2 партициями и replication factor 1
       KAFKA_CREATE_TOPICS: "widget-events:2:1"
+      # Replication factor для служебного топика __consumer_offsets (1 — т.к. у нас 1 брокер)
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
   kafka-ui:
