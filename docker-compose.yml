@@ -88,3 +88,8 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=auditlogsdb
+
+
+
+# docker network ls - list active networks
+# docker network inspect load-balancer-ms_default - inspect network
